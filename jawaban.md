@@ -124,6 +124,14 @@ docker compose -p k9 -f 01-sumber-lab/b/b1-compose/docker-compose.yml down -v
 ```
 **Analisis:**
 Docker Compose berhasil membersihkan lingkungan lab dengan menghapus container `k9-attacker-1`, `k9-target-1`, serta jaringan `k9_lab`. Opsi `-v` memastikan seluruh volume terkait juga ikut dihapus sehingga sistem kembali bersih dan tidak menyisakan resource yang tidak terpakai.
+<details>
+   <summary><b>Klik untuk melihat Bukti Tugas 1 (2 Gambar)</b></summary>
+   
+**Bukti 1 - isi file dari container baru**
+![Bukti Tugas 1 - Isi File Volume](./Screenshot/Soal%201/4.png)
+**Bukti 2 - halaman nginx yang diakses dari attacker**
+![Bukti Tugas 1 - Halaman nginx](./Screenshot/Soal%201/6.png)
+</details>
 
 ## Tugas 2 (Pertemuan 2): Kriptografi
 ### 1. Enkripsi dan Dekripsi File Simetris Menggunakan OpenSSL AES-256-CBC
@@ -153,6 +161,19 @@ notAfter=Dec 23 05:57:28 2026 GMT
 ```
 **Analisis:**
 OpenSSL berhasil menghasilkan kunci privat `key-k9.pem` dan sertifikat publik `cert-k9.pem`. Pada hasil pemeriksaan sertifikat, terlihat bahwa nilai subject dan issuer sama-sama `CN=k9.uts.local`, yang membuktikan bahwa sertifikat ini ditandatangani sendiri (_self-signed_). Selain itu, masa berlaku sertifikat tercatat mulai 23 November 2026 hingga 23 Desember 2026, sesuai dengan parameter -`days 30` yang dikonfigurasi.
+
+**Perbedaan sertifikat self-signed dan sertifikat yang ditandatangani CA.**
+```text
+Sertifikat self-signed ditandatangani sendiri oleh pemilik domain sehingga tidak memiliki pihak ketiga penjamin keaslian dan biasanya memicu peringatan keamanan pada peramban. Sebaliknya, sertifikat yang ditandatangani oleh Certificate Authority (CA) diverifikasi dan dijamin keabsahannya oleh lembaga tepercaya yang diakui secara global oleh sistem operasi dan peramban.
+```
+<details>
+   <summary><b>Klik untuk melihat Bukti Tugas 2 (2 Gambar)</b></summary>
+   
+**Bukti 1 - dua hash SHA-256 harus sama**
+![Bukti Tugas 1 - Hash SHA-256](./Screenshot/Soal%202/1.png)
+**Bukti 2 - Subject dan Issuer sertifikat**
+![Bukti Tugas 1 - Sertifikat X.509](./Screenshot/Soal%202/2.png)
+</details>
 
 ## Tugas 3 (Pertemuan 3): ARP spoofing
 ### 1. Membuat Jaringan Bridge Khusus untuk Simulasi ARP Spoofing
@@ -281,6 +302,23 @@ gateway-k9.lab-arp-k9 (172.18.0.3) at be:5b:37:87:4c:98 [ether] PERM on eth0
 **Analisis:**
 Tabel ARP `korban-k9` menunjukkan bahwa IP `gateway-k9` (`172.18.0.3`) telah kembali terpetakan ke MAC address aslinya (`be:5b:37:87:4c:98`) dengan status `PERM` (_permanent_). Penanda `PERM` membuktikan bahwa entri tersebut terkunci secara statis dan tidak dapat ditimpa lagi oleh paket ARP spoofing dari penyerang.
 
+**Jelaskan satu mitigasi selain static ARP.**
+```text
+Mitigasi lain yang efektif adalah mengaktifkan fitur Dynamic ARP Inspection (DAI) pada switch jaringan, yang bekerja dengan memvalidasi setiap paket ARP terhadap basis data DHCP Snooping Binding dan membuang paket ARP yang pemetaan IP-ke-MAC-nya tidak sah.
+```
+<details>
+   <summary><b>Klik untuk melihat Bukti Tugas 3 (3 Gambar)</b></summary>
+   
+**Bukti 1 - Tabel ARP Awal**
+![Bukti Tugas 1 - Tabel ARP Awal](./Screenshot/Soal%203/6.png)
+
+**Bukti 2 - Tabel ARP Sesudah Spoofing**
+![Bukti Tugas 1 - Tabel ARP Sesudah Spoofing](./Screenshot/Soal%203/8.png)
+
+**Bukti 3 - Tabel ARP Sesudah Mitigasi**
+![Bukti Tugas 1 - Tabel ARP Sesudah Mitigasi](./Screenshot/Soal%203/10.png)
+</details>
+
 ## Tugas 4 (Pertemuan 4): Analisis handshake WPA2
 ### Analisis dan Pengujian Wordlist terhadap WPA2 Handshake dengan Aircrack-ng
 Perintah ini digunakan untuk menjalankan utilitas `aircrack-ng` di dalam container `uts-kali-tools` guna menganalisis tangkapan paket WPA2 (`handshake-k9.cap`) dan menguji seluruh kombinasi kata sandi yang terdapat pada file `wordlist-k9.txt`.
@@ -336,6 +374,13 @@ Read 499 packets.
 3. Message 3 (AP → Client): AP memverifikasi MIC dari klien, menghitung PTK yang sama, lalu mengirimkan GTK (Group Temporal Key untuk enkripsi lalu lintas broadcast/multicast) beserta MIC kepada klien.
 4. Message 4 (Client → AP): Klien mengirimkan pesan konfirmasi (ACK) kepada AP bahwa seluruh kunci telah terpasang dan komunikasi terenkripsi siap digunakan.
 ```
+<details>
+   <summary><b>Klik untuk melihat Bukti Tugas 4 (1 Gambar)</b></summary>
+   
+**Bukti 1 - kata sandi yang ditemukan, atau pesan KEY NOT FOUND**
+![Bukti Tugas 1 - Hasil Aircrack-ng](./Screenshot/Soal%204/1.png)
+</details>
+
 
 ## Tugas 5 (Pertemuan 5): ICMP dengan Scapy
 ### Mengirim dan Menganalisis Paket ICMP Menggunakan Scapy
@@ -356,6 +401,12 @@ Scapy berhasil mengirimkan paket ICMP Echo Request dari `172.18.0.5` menuju `172
 ```text
 Smurf Attack adalah jenis serangan Distributed Denial of Service (DDoS) pada lapisan jaringan (Network Layer) yang memanfaatkan protokol ICMP dan alamat IP broadcast.
 ```
+<details>
+   <summary><b>Klik untuk melihat Bukti Tugas 5 (1 Gambar)</b></summary>
+   
+**Bukti 1 - TTL dan tipe ICMP balasan**
+![Bukti Tugas 1 - Balasan ICMP Scapy](./Screenshot/Soal%205/1.png)
+</details>
 
 ## Tugas 6 (Pertemuan 6): SYN flood dan three-way handshake
 ### 1. Menjalankan Lingkungan Simulasi SYN Flood dengan Docker Compose
@@ -453,6 +504,23 @@ docker compose -p k9 -f 01-sumber-lab/b/b3-syn-flood/docker-compose.yml down -v
 **Analisis:**
 Docker Compose berhasil membersihkan seluruh lingkungan lab dengan menghapus container `k9-attacker-1`, `k9-target-1`, serta jaringan `k9_lab`. Opsi `-v` memastikan seluruh volume terkait juga ikut dihapus sehingga sistem kembali bersih dan bebas dari sisa proses simulasi serangan.
 
+**Jelaskan satu mitigasi SYN flood.**
+```text
+Salah satu mitigasi SYN flood adalah mengaktifkan SYN Cookies pada server, yaitu mekanisme yang tidak langsung mengalokasikan memori antrean saat menerima paket SYN, melainkan menyandikan informasi koneksi ke dalam nomor urut (sequence number) paket SYN-ACK hingga klien mengirimkan paket ACK balasan yang valid.
+```
+<details>
+   <summary><b>Klik untuk melihat Bukti Tugas 6 (3 Gambar)</b></summary>
+   
+**Bukti 1 - jumlah SYN_RECV sebelum**
+![Bukti Tugas 1 - SYN_RECV Sebelum Serangan](./Screenshot/Soal%206/2.png)
+
+**Bukti 2 - saat serangan**
+![Bukti Tugas 1 - SYN_RECV Saat Serangan](./Screenshot/Soal%206/4.png)
+
+**Bukti 3 - paket SYN, SYN-ACK, dan ACK dari tcpdump**
+![Bukti Tugas 1 - Three-Way Handshake tcpdump](./Screenshot/Soal%206/6.png)
+</details>
+
 ## Tugas 7 (Pertemuan 7): DNS exfiltration
 ### 1. Menjalankan Lingkungan Simulasi DNS Exfiltration dengan Docker Compose
 Perintah ini digunakan untuk membangun jaringan virtual dan menjalankan container `k9-attacker-1` serta `k9-dns-1` di latar belakang menggunakan file konfigurasi docker-compose.yml untuk simulasi DNS Exfiltration.
@@ -547,3 +615,18 @@ docker compose -p k9 -f 01-sumber-lab/b/b4-dns-exfil/docker-compose.yml down -v
 ```
 **Analisis:**
 Docker Compose berhasil membersihkan lingkungan lab dengan menghapus container `k9-dns-1`, `k9-attacker-1`, serta jaringan `k9-attacker-1`. Opsi `-v` memastikan seluruh volume terkait juga ikut terhapus sehingga sistem kembali bersih dan bebas dari sisa resource pengujian.
+
+**Jelaskan mengapa teknik ini sulit diblokir firewall biasa dan sebutkan satu indikator deteksinya.**
+```text
+Teknik DNS exfiltration sulit diblokir oleh firewall konvensional karena menggunakan protokol DNS (port 53 UDP/TCP) yang memang wajib diizinkan agar pengguna dapat mengakses internet, serta kuerinya diteruskan secara sah oleh DNS resolver internal. Salah satu indikator deteksinya adalah kemunculan nama subdomain yang sangat panjang dan memiliki entropi tinggi (acak/heksadesimal) serta frekuensi kueri yang tidak wajar menuju satu domain induk tertentu.
+```
+<details>
+<summary><b>Klik untuk melihat Bukti Tugas 7 (2 Gambar)</b></summary>
+
+**Bukti 1 - label hex yang terdeteksi di log**
+![Bukti Tugas 1 - Deteksi Label Hex di Log](./Screenshot/Soal%207/5%20fix.png)
+
+**Bukti 2 - pesan NIM hasil decode**
+![Bukti Tugas 1 - Hasil Decode NIM](./Screenshot/Soal%207/6%20fix.png)
+
+</details>
