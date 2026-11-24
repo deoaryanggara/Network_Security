@@ -133,6 +133,8 @@ Docker Compose berhasil membersihkan lingkungan lab dengan menghapus container `
 ![Bukti Tugas 1 - Halaman nginx](./Screenshot/Soal%201/6.png)
 </details>
 
+---
+
 ## Tugas 2 (Pertemuan 2): Kriptografi
 ### 1. Enkripsi dan Dekripsi File Simetris Menggunakan OpenSSL AES-256-CBC
 Perintah ini digunakan untuk menjalankan container `uts-openssl` guna mengenkripsi file teks menggunakan algoritma AES-256-CBC dengan PBKDF2, mendekripsinya kembali, serta memverifikasi integritas data menggunakan SHA-256.
@@ -174,6 +176,8 @@ Sertifikat self-signed ditandatangani sendiri oleh pemilik domain sehingga tidak
 **Bukti 2 - Subject dan Issuer sertifikat**
 ![Bukti Tugas 1 - Sertifikat X.509](./Screenshot/Soal%202/2.png)
 </details>
+
+---
 
 ## Tugas 3 (Pertemuan 3): ARP spoofing
 ### 1. Membuat Jaringan Bridge Khusus untuk Simulasi ARP Spoofing
@@ -319,6 +323,8 @@ Mitigasi lain yang efektif adalah mengaktifkan fitur Dynamic ARP Inspection (DAI
 ![Bukti Tugas 1 - Tabel ARP Sesudah Mitigasi](./Screenshot/Soal%203/10.png)
 </details>
 
+---
+
 ## Tugas 4 (Pertemuan 4): Analisis handshake WPA2
 ### Analisis dan Pengujian Wordlist terhadap WPA2 Handshake dengan Aircrack-ng
 Perintah ini digunakan untuk menjalankan utilitas `aircrack-ng` di dalam container `uts-kali-tools` guna menganalisis tangkapan paket WPA2 (`handshake-k9.cap`) dan menguji seluruh kombinasi kata sandi yang terdapat pada file `wordlist-k9.txt`.
@@ -381,6 +387,7 @@ Read 499 packets.
 ![Bukti Tugas 1 - Hasil Aircrack-ng](./Screenshot/Soal%204/1.png)
 </details>
 
+---
 
 ## Tugas 5 (Pertemuan 5): ICMP dengan Scapy
 ### Mengirim dan Menganalisis Paket ICMP Menggunakan Scapy
@@ -407,6 +414,8 @@ Smurf Attack adalah jenis serangan Distributed Denial of Service (DDoS) pada lap
 **Bukti 1 - TTL dan tipe ICMP balasan**
 ![Bukti Tugas 1 - Balasan ICMP Scapy](./Screenshot/Soal%205/1.png)
 </details>
+
+---
 
 ## Tugas 6 (Pertemuan 6): SYN flood dan three-way handshake
 ### 1. Menjalankan Lingkungan Simulasi SYN Flood dengan Docker Compose
@@ -520,6 +529,8 @@ Salah satu mitigasi SYN flood adalah mengaktifkan SYN Cookies pada server, yaitu
 **Bukti 3 - paket SYN, SYN-ACK, dan ACK dari tcpdump**
 ![Bukti Tugas 1 - Three-Way Handshake tcpdump](./Screenshot/Soal%206/6.png)
 </details>
+
+---
 
 ## Tugas 7 (Pertemuan 7): DNS exfiltration
 ### 1. Menjalankan Lingkungan Simulasi DNS Exfiltration dengan Docker Compose
